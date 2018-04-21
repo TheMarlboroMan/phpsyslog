@@ -1,13 +1,4 @@
 <?php
-/*
-To make this work don't forget to:
-
-- Add the line that pulls your facility to your log file in the syslog config file, like:
-	myapp				/var/log/myapp.log
-- Optionally mute your facility in the general system log.
-- Restart the service (sudo service rsyslog restart will do).
-*/
-
 //This should load the PHP5 or 4 version, along with the needed free functions.
 require("src/phpsyslog.php");
 

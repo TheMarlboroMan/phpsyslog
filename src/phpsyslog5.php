@@ -1,5 +1,4 @@
 <?php
-
 //!Free function to init the syslog, which is equivalent to syslog::init();
 function phpsyslog_init($_facility, $_flags=LOG_PID | LOG_ODELAY, $_type=LOG_LOCAL0) {
 
