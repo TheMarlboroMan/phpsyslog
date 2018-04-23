@@ -3,10 +3,11 @@
 //!the inner workings are completely different... There will be holes all over
 //!the place if you don't stick to the interface!.
 
-DEFINE('DEFAULT_PHP_SYSLOG_FACILITY_NAME', 'phpsyslog');
+DEFINE('DEFAULT_PHP_SYSLOG_NAME', 'phpsyslog');
+define('LOGPID_OR_LOGODELAY', 5);
 
-function phpsyslog_init($_facility, $_flags=LOG_PID | LOG_ODELAY, $_type=LOG_LOCAL0) {
-	return phpsyslog::init($_facility, $_flags, $_type);
+function phpsyslog_init($_name, $_flags=LOGPID_OR_LOGODELAY, $_facility=LOG_LOCAL0) {
+	return phpsyslog::init($_name, $_flags, $_facility);
 }
 
 function phpsyslog_shutdown() {
@@ -17,7 +18,7 @@ function qlog($_level, $_msg) {
 	
 	$log=phpsyslog::get();
 	if(!$log) {
-		phpsyslog_init(get_default_phpsyslog_facility_name());
+		phpsyslog_init(get_default_phpsyslog_name());
 		phpsyslog::get()->log($_level, $_msg);
 	}
 	else {
@@ -25,8 +26,8 @@ function qlog($_level, $_msg) {
 	}
 }
 
-function get_default_phpsyslog_facility_name() {
-	return DEFAULT_PHP_SYSLOG_FACILITY_NAME;
+function get_default_phpsyslog_name() {
+	return DEFAULT_PHP_SYSLOG_NAME;
 }
 
 $_phpsysloginstance=null;
@@ -37,18 +38,18 @@ $_phpsysloginstance=null;
 
 class phpsyslog {
 
-	var $facility=null;
+	var $name=null;
 
-	//! Do man syslog if you want to know more about $_flags and $_type.
-	function init($_facility, $_flags=LOG_PID | LOG_ODELAY, $_type=LOG_LOCAL0) {
+	//! Do man syslog if you want to know more about $_flags and $_facility.
+	function init($_name, $_flags=LOGPID_OR_LOGODELAY, $_facility=LOG_LOCAL0) {
 
 		global $_phpsysloginstance;
 		if($_phpsysloginstance) {
 			return false;	//No exception handling makes me sad.
 		}
 
-		$_phpsysloginstance=new phpsyslog($_facility, $_flags, $_type);
-		$_phpsysloginstance->log(LOG_INFO, $_facility." log (version 4) was init");
+		$_phpsysloginstance=new phpsyslog($_name, $_flags, $_facility);
+		$_phpsysloginstance->log(LOG_INFO, $_name." log (version 4) was init");
 		return $_phpsysloginstance;
 	}
 
@@ -62,7 +63,7 @@ class phpsyslog {
 		if(!$_phpsysloginstance) {
 			return false;	//Yet again, no exception handling.
 		}
-		$_phpsysloginstance->log(LOG_INFO, $_phpsysloginstance->facility." will shutdown");
+		$_phpsysloginstance->log(LOG_INFO, $_phpsysloginstance->name." will shutdown");
 		$_phpsysloginstance=null;
 		closelog();
 	}
@@ -79,15 +80,15 @@ class phpsyslog {
 		syslog($_level, translate_phpsyslog_level($_level).' : '.$_msg);
 	}
 
-	function phpsyslog($_facility, $_flags=LOG_PID | LOG_ODELAY, $_type=LOG_LOCAL0) {
-		$this->facility=$_facility;
-		if(!openlog($this->facility, $_flags, $_type)) {
+	function phpsyslog($_name, $_flags=LOGPID_OR_LOGODELAY, $_facility=LOG_LOCAL0) {
+		$this->name=$_name;
+		if(!openlog($this->name, $_flags, $_facility)) {
 			return false;	//Meeeh.
 		}
 	}
 
 	//Now, this would be a rare case.
-	function __constructor($_facility, $_flags=LOG_PID | LOG_ODELAY, $_type=LOG_LOCAL0) {
-		$this->phpsyslog($_facility, $_flags, $_type);
+	function __constructor($_name, $_flags=LOGPID_OR_LOGODELAY, $_facility=LOG_LOCAL0) {
+		$this->phpsyslog($_name, $_flags, $_facility);
 	}
 }

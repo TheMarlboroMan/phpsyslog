@@ -9,7 +9,7 @@ require("src/phpsyslog.php");
 //will make their best to avoid exposing exceptions, making them usable in 
 //both PHP versions.
 
-//First we must init the log so we can set the facility name and locate it
+//First we must init the log so we can set the app name and locate it
 //in our log files. This will use the default flags
 phpsyslog_init("myapp");
 
@@ -42,11 +42,11 @@ phpsyslog::stlog(LOG_INFO, "This is the static way of writing log info");
 //When we are done we can (it is optional) close the logger.
 phpsyslog::shutdown();
 
-//One final note: after cleanup or whithout init the facility name is lost.
+//One final note: after cleanup or whithout init the app name is lost.
 //Qlog will set up a default logger if invoked but dood luck finding it in your 
 //system logs... In this case you can always change the system configuration
-//of your syslogd so get_default_phpsyslog_facility_name() redirects to the
-//correct files. The value returned by get_default_phpsyslog_facility_name()
+//of your syslogd so get_default_phpsyslog_name() redirects to the
+//correct files. The value returned by get_default_phpsyslog_name()
 //is "phpsyslog".
 
-qlog(LOG_INFO, "qlog using the default facility name, which should be ".get_default_phpsyslog_facility_name());
+qlog(LOG_INFO, "qlog using the default name, which should be ".get_default_phpsyslog_name());

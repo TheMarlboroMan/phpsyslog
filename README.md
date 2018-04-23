@@ -7,21 +7,21 @@ It used to be that you would go over UDP in port 514 to talk to the syslog daemo
 
 So... Why should you prefer:
 
-	phpsyslog_init("facility_name");
+	phpsyslog_init("app_name");
 	qlog(LOG_INFO, "Log");
 	qlog(LOG_INFO, "Another");
 	phpsyslog_shutdown();
 
 ... or even ...
 
-	phpsyslog::init("facility_name");
+	phpsyslog::init("app_name");
 	phpsyslog::get()->log(LOG_INFO, "log");
 	phpsyslog::stlog(LOG_INFO, "Another");
 	phpsyslog::shutdown();
 
 ... to good old ...
 
-	openlog("facility_name", LOG_PID | LOG_ODELAY, LOG_LOCAL0);
+	openlog("app_name", LOG_PID | LOG_ODELAY, LOG_LOCAL0);
 	syslog(LOG_INFO, "Log");
 	syslog(LOG_INFO, "Another");
 	closelog();
@@ -49,12 +49,9 @@ If you need information about logging levels and flags do a "man syslog" :).
 
 To make this work don't forget to:
 
-- Add the line that pulls your facility to your log file in the syslog config file, like:
-	myapp				/var/log/myapp.log
+- Add/check the line that pulls your to your log file in the syslog config file, like:
+	[facilityname]			/var/log/myapp.log
 
-- Maybe you'll also want to add the default facility name:
-	phpsyslog			/var/log/phpsyslog.log
-
-- Optionally mute your facility in the general system log (talk to your sysadmin).
+- Optionally mute it in the general system log (talk to your sysadmin).
 - Restart the service (sudo service rsyslog restart will do).
-- Specify a facility name when you init the log.
+- Specify an app name when you init the log, in case you can resort to advanced filtering.

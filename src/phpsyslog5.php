@@ -1,9 +1,13 @@
 <?php
+
+//Stupid PHP won't let us do LOG_PID | LOG_ODELAY when defining a default parameter.
+define('LOGPID_OR_LOGODELAY', 5);
+
 //!Free function to init the syslog, which is equivalent to syslog::init();
-function phpsyslog_init($_facility, $_flags=LOG_PID | LOG_ODELAY, $_type=LOG_LOCAL0) {
+function phpsyslog_init($_name, $_flags=LOGPID_OR_LOGODELAY, $_facility=LOG_LOCAL0) {
 
 	try {
-		return phpsyslog::init($_facility, $_flags, $_type);
+		return phpsyslog::init($_name, $_flags, $_facility);
 	}
 	catch(\Exception $e) {
 		return phpsyslog::get();
@@ -31,29 +35,29 @@ function qlog($_level, $_msg) {
 		phpsyslog::get()->log($_level, $_msg);
 	}
 	catch(\Exception $e) {
-		phpsyslog::init(get_default_phpsyslog_facility_name())->log($_level, $_msg);
+		phpsyslog::init(get_default_phpsyslog_name())->log($_level, $_msg);
 	}
 }
 
-function get_default_phpsyslog_facility_name() {
-	return phpsyslog::_DEFAULT_FACILITY_NAME;
+function get_default_phpsyslog_name() {
+	return phpsyslog::_DEFAULT_APP_NAME;
 }
 
 //Implemented as a singleton with a few security measures.
 class phpsyslog {
 
-	const _DEFAULT_FACILITY_NAME="phpsyslog";
+	const _DEFAULT_APP_NAME="phpsyslog";
 
 	private static $instance=null;
-	private $facility=null;
+	private $name=null;
 
-	//! Do man syslog if you want to know more about $_flags and $_type.
-	public static function &init($_facility, $_flags=LOG_PID | LOG_ODELAY, $_type=LOG_LOCAL0) {
+	//! Do man syslog if you want to know more about $_flags and $_facility.
+	public static function &init($_name, $_flags=LOGPID_OR_LOGODELAY, $_facility=LOG_LOCAL0) {
 		if(self::$instance) {
 			throw new \Exception("Cannot init the log twice");
 		}
-		self::$instance=new phpsyslog($_facility, $_flags, $_type);
-		self::$instance->log(LOG_INFO, $_facility." log (version 5) was init");
+		self::$instance=new phpsyslog($_name, $_flags, $_facility);
+		self::$instance->log(LOG_INFO, $_name." log (version 5) was init");
 		return self::$instance;
 	}
 
@@ -68,7 +72,7 @@ class phpsyslog {
 		if(!self::$instance) {
 			throw new \Exception("Cannot invoke shutdown if the log was not init");
 		}
-		self::$instance->log(LOG_INFO, self::$instance->facility." will shutdown");
+		self::$instance->log(LOG_INFO, self::$instance->name." will shutdown");
 		self::$instance=null;
 		closelog();
 	}
@@ -88,10 +92,10 @@ class phpsyslog {
 		syslog($_level, translate_phpsyslog_level($_level).' : '.$_msg);
 	}
 
-	private function __construct($_facility, $_flags=LOG_PID | LOG_ODELAY, $_type=LOG_LOCAL0) {
+	private function __construct($_name, $_flags=LOGPID_OR_LOGODELAY, $_facility=LOG_LOCAL0) {
 
-		$this->facility=$_facility;
-		if(!openlog($this->facility, $_flags, $_type)) {
+		$this->name=$_name;
+		if(!openlog($this->name, $_flags, $_facility)) {
 			throw new \Exception('Could not open log');
 		}
 	}
