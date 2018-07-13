@@ -6,6 +6,21 @@
 DEFINE('DEFAULT_PHP_SYSLOG_NAME', 'phpsyslog');
 define('LOGPID_OR_LOGODELAY', 5);
 
+function translate_phpsyslog_level($_lvl) {
+	switch($_lvl) {
+		//I love useless breaks.
+		case LOG_EMERG: return "[EMERGENCY]"; break;	//system is unusable
+		case LOG_ALERT: return "[ALERT]"; break;	//action must be taken immediately
+		case LOG_CRIT: return "[CRITICAL]"; break;	//critical conditions
+		case LOG_ERR: return "[ERROR]"; break;		//error conditions
+		case LOG_WARNING: return "[WARNING]"; break;	//warning conditions
+		case LOG_NOTICE: return "[NOTICE]"; break;	//normal, but significant, condition
+		case LOG_INFO: return "[INFO]"; break;		//informational message
+		case LOG_DEBUG: return "[DEBUG]"; break;	//debug-level message
+		default: return "[???]"; break;			//WTF did you do???.
+	}
+}
+
 function phpsyslog_init($_name, $_flags=LOGPID_OR_LOGODELAY, $_facility=LOG_LOCAL0) {
 	return phpsyslog::init($_name, $_flags, $_facility);
 }
@@ -15,7 +30,7 @@ function phpsyslog_shutdown() {
 }
 
 function qlog($_level, $_msg) {
-	
+
 	$log=phpsyslog::get();
 	if(!$log) {
 		phpsyslog_init(get_default_phpsyslog_name());
@@ -75,7 +90,7 @@ class phpsyslog {
 		}
 		$_phpsysloginstance->log($_level, $_msg);
 	}
-	
+
 	function log($_level, $_msg) {
 		syslog($_level, translate_phpsyslog_level($_level).' : '.$_msg);
 	}
