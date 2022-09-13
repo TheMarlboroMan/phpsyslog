@@ -1,6 +1,10 @@
 # phpsyslog
 OO and free function interfaces for syslog.
 
+## Archiving
+
+As of September 2022 this project is archived and will be developed no longer. Consider using a logger class if need be.
+
 ## Why?
 
 It used to be that you would go over UDP in port 514 to talk to the syslog daemon. Then the people on the SUS came up with openlog(), closelog() and syslog() and everything became easier.
@@ -32,7 +36,7 @@ Well, maybe you shouldn't. Personally I would use it because of the following ad
 
 	- Auto formatting of log levels.
 	- Code safety in PHP5 and higher.
-	- Non-conformism to the tyrants at the PSR-3 (okay,maybe not an advantage).
+	- Non-conformism to the tyrants at the PSR-3 (just joking).
 	- Future extensibility, as this project is - more than anything - a logger interface: perhaps you'll want to extend it with database logging, remote file logging, /dev/null redirecting...
 
 Perhaps the right question is... do I really need 100 lines of a logger class and helper functions when I can use the built-in ones?. I'd personally say that you don't *need* it, but could *benefit* of it (for the aforementioned reasons). Also, if you were to strip the comments, white lines and formatting quirks you could get the same funcionality in less than 50 lines ;).
